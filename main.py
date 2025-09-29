@@ -5,8 +5,11 @@ API para gestión de tareas con base de datos SQLite
 
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 from typing import List
+import os
 
 import models
 import schemas
@@ -32,8 +35,17 @@ app.add_middleware(
     allow_headers=["*"],
 )       
 
+# Montar archivos estáticos
+static_dir = os.path.join(os.path.dirname(__file__), "static")
+app.mount("/static", StaticFiles(directory=static_dir), name="static")
+
 @app.get("/")
-async def root():
+async def read_index():
+    """Servir la página principal del cliente"""
+    return FileResponse(os.path.join(static_dir, "index.html"))
+
+@app.get("/api")
+async def api_root():
     return {"message": "Todo List API", "docs": "/docs"}
 
 
